@@ -4,7 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [msg, setMsg] = useState('Not Yet')
 
   return (
     <>
@@ -16,10 +16,22 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React</h1>
+      <h1>{msg}</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+        <button onClick={() => {
+          fetch('http://localhost:8000')
+            .then(res => {
+              if (!res.ok) {
+                throw new Error('Bad Request')
+              }
+              return res.json()
+            })
+            .then(data => {
+              const msg = data.message
+              setMsg(msg)
+            })
+        }}>
+          Update
         </button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
