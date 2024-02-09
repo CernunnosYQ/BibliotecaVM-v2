@@ -1,66 +1,52 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
-import config
+from fastapi.responses import JSONResponse
 
-app = FastAPI()
-
-
-origins = [
-    "http://localhost:5173",
-    "https://localhost:5173",
-]
+from config import settings
+from session import engine
+from models import Base
+from routes import router as api_router
 
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+def create_tables():
+    Base.metadata.create_all(bind=engine)
 
 
-@app.get("/")
-async def index():
-    """Welcome for everyone"""
+def include_router(app):
+    app.include_router(api_router, prefix="/api")
 
+
+def add_middleware(app):
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGIN,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+
+def start_application() -> FastAPI:
+    app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
+    create_tables()
+    add_middleware(app)
+    include_router(app)
+    return app
+
+
+app = start_application()
+
+
+@app.get("/api/")
+def read_root():
     return {
-        "message": "Hello World! This is a simple private library manager and my first API with FastAPI"
+        "message": f"Welcome to {settings.PROJECT_NAME} API {settings.PROJECT_VERSION}"
     }
 
 
-@app.get("/books/")
-async def search_book(skip: int = 0, limit: int = 10):
-    """Main API route.
-
-    Returns the complete booklist, accepts some filter params"""
-
-    return {"books": ["Books", "from", skip, "to", skip + limit]}
-
-
-@app.post("/books/")
-async def add_new_book():
-    """Create a new book data, needs authentication"""
-
-    return {"message": "Book data was successfully created"}
-
-
-@app.get("/books/{book_id}")
-async def get_book(book_id: int):
-    """Get book data by ID"""
-
-    return {"message": f"This is the book with ID {book_id}"}
-
-
-@app.put("/books/{book_id}")
-async def edit_book(book_id: int):
-    """Overides a book data"""
-
-    return {"message": f"Book registry with ID {book_id} was successfully modified"}
-
-
-@app.delete("/books/{book_id}")
-async def delete_book(book_id: int):
-    """Delete a book data"""
-
-    return {"message": f"Book registry with ID {book_id} was successfully deleted"}
+@app.exception_handler(ValueError)
+def handle_value_errors(request, exc):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={"detail": str(exc)},
+    )
