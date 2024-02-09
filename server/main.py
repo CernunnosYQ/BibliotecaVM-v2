@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import config
 
 app = FastAPI()
 
 
 origins = [
-    'http://localhost:5173',
-    'https://localhost:5173',
+    "http://localhost:5173",
+    "https://localhost:5173",
 ]
 
 
@@ -23,13 +24,15 @@ app.add_middleware(
 async def index():
     """Welcome for everyone"""
 
-    return {"message": "Hello World! This is a simple private library manager and my first API with FastAPI"}
+    return {
+        "message": "Hello World! This is a simple private library manager and my first API with FastAPI"
+    }
 
 
 @app.get("/books/")
 async def search_book(skip: int = 0, limit: int = 10):
     """Main API route.
-    
+
     Returns the complete booklist, accepts some filter params"""
 
     return {"books": ["Books", "from", skip, "to", skip + limit]}
