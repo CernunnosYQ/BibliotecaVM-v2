@@ -53,7 +53,7 @@ def get_book_by_id(id, db):
     return book
 
 
-def update_book(id, book, db):
+def update_book_by_id(id, book, db):
     old_book = db.query(Book).filter(Book.id == id).first()
     if not old_book:
         return {"detail": f"Book with ID {id} not found."}
@@ -65,7 +65,7 @@ def update_book(id, book, db):
     return old_book
 
 
-def delete_book(id, db):
+def delete_book_by_id(id, db):
     book = db.query(Book).filter(Book.id == id)
     if not book:
         return {"detail": f"Book with ID {id} not found."}
