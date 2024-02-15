@@ -20,10 +20,9 @@ class Settings:
 
     SECRET_KEY: str = os.getenv("SECRET_KEY")
 
-    CORS_ORIGIN: list[str] = (
-        json.loads(os.getenv("CORS_ORIGIN")) if os.getenv("CORS_ORIGIN") else []
+    CORS_ORIGINS: list[str] = (
+        json.loads(os.getenv("CORS_ORIGINS")) if os.getenv("CORS_ORIGINS") else []
     )
 
 
 settings = Settings()
-print(f"\n{settings.PROJECT_NAME}\nVersion: {settings.PROJECT_VERSION}")

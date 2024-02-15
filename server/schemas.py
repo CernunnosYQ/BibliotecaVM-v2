@@ -6,6 +6,7 @@ from typing import Optional, List
 class BookCreate(BaseModel):
     title: str
     author: str
+    editorial: str
     isbn: Optional[str] = None
     synopsis: Optional[str] = None
     tags: Optional[List[str]] = []
@@ -18,6 +19,7 @@ class BookShow(BaseModel):
     author: str
     title: str
     isbn: Optional[str]
+    editorial: str
     synopsis: str
     is_available: bool
     loan_from: Optional[datetime]
@@ -26,9 +28,6 @@ class BookShow(BaseModel):
 
 
 class BookUpdate(BookCreate):
-    author: str
-    title: str
-    isbn: Optional[str] = None
     synopsis: Optional[str] = None
     is_available: bool
     loan_from: Optional[datetime] = None

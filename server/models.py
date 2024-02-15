@@ -28,6 +28,7 @@ class Book(Base):
     title = Column(String(75), nullable=False)
     author = Column(String(75), nullable=False)
     isbn = Column(String(20))
+    editorial = Column(String(50))
     synopsis = Column(Text)
     is_available = Column(Boolean, default=True)
     loan_from = Column(DateTime)
