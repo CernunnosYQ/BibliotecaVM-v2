@@ -30,9 +30,8 @@ class Book(Base):
     isbn = Column(String(20))
     editorial = Column(String(50))
     synopsis = Column(Text)
+    book_type = Column(String(25))  # e.g., ["hardcover", "paperback", "digital"]
     is_available = Column(Boolean, default=True)
-    loan_from = Column(DateTime)
-    loan_to = Column(DateTime)
     tags = Column(ARRAY(String))
 
 

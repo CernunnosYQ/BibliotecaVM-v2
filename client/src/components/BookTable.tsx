@@ -1,3 +1,6 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faEllipsis } from "@fortawesome/free-solid-svg-icons"
+
 type BookListProps = {
   book_list: BookProps[]
 }
@@ -9,6 +12,7 @@ export interface BookProps {
   isbn?: string | undefined
   synopsis?: string | undefined
   editorial: string
+  book_type?: string
   tags: string[]
   is_available: string
 }
@@ -22,11 +26,11 @@ const BookTable = (props: BookListProps) => {
       <thead className="block md:table-header-group">
         <tr className="border border-grey-500 md:border-none block md:table-row absolute -top-full md:top-auto -left-full md:left-auto  md:relative">
           <th className="pb-3 bg-gray-600 p-2 text-white font-bold md:border md:border-grey-500 text-left block md:table-cell"></th>
-          <th className="bg-gray-600 p-2 text-white font-bold md:border md:border-grey-500 text-left block md:table-cell">Title / Author</th>
+          <th className="bg-gray-600 p-2 text-white font-bold md:border md:border-grey-500 text-left block md:table-cell">Titulo</th>
+          <th className="bg-gray-600 p-2 text-white font-bold md:border md:border-grey-500 text-left block md:table-cell">Autor</th>
           <th className="bg-gray-600 p-2 text-white font-bold md:border md:border-grey-500 text-left block md:table-cell">Editorial</th>
-          <th className="bg-gray-600 p-2 text-white font-bold md:border md:border-grey-500 text-left block md:table-cell">Categories</th>
-          <th className="bg-gray-600 p-2 text-white font-bold md:border md:border-grey-500 text-left block md:table-cell">Status</th>
-          <th className="bg-gray-600 p-2 text-white font-bold md:border md:border-grey-500 text-left block md:table-cell"></th>
+          <th className="bg-gray-600 p-2 text-white font-bold md:border md:border-grey-500 text-left block md:table-cell">Categorías</th>
+          <th className="bg-gray-600 p-2 text-white font-bold md:border md:border-grey-500 text-left block md:table-cell">Tipo</th>
           <th className="bg-gray-600 p-2 text-white font-bold md:border md:border-grey-500 text-left block md:table-cell"></th>
         </tr>
       </thead>
@@ -50,31 +54,33 @@ const Book = ({ id, title, author, editorial, tags, is_available }: BookProps) =
     )
   })
 
+  console.log(is_available)
+
   return (
     <tr key={id} className="border-cstmgray-700 border-t">
-      <td className="py-2 align-middle">
-
+      <td className="p-2 align-middle">
+        <p className={"py-2 rounded-full" + (is_available ? " bg-emerald-500" : " bg-amber-500")}></p>
       </td>
       <td className="py-2 align-middle">
         <p className="">{title}</p>
-        <p className="text-cstmgray-700">{author}</p>
+      </td>
+      <td className="py-2 align-middle">
+        <p className="">{author}</p>
+
       </td>
       <td className="py-2 align-middle">{editorial}</td>
       <td className="py-2 align-middle">
         {category_badges}
       </td>
-      <td className="py-2 align-middle">{is_available}</td>
       <td className="py-2 align-middle text-center">
-        <button className="bg-teal-400 hover:bg-teal-500 px-8 py-2 rounded-full text-cstmgray-800">
-          View
-        </button>
+
       </td>
       <td className="py-2 align-middle text-center">
-        <button className="hover:bg-cstmgray-800 px-4 py-2 rounded-full">
-          ...
+        <button className="bg-gray-600 hover:bg-gray-500 px-4 py-1 rounded-full text-gray-200">
+          <FontAwesomeIcon icon={faEllipsis} color="#fff" />
         </button>
       </td>
-    </tr>
+    </tr >
   )
 }
 
