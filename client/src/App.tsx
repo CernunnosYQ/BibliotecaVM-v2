@@ -28,6 +28,12 @@ function App() {
     }
   };
 
+  const openModal = (action: string, id?: number) => {
+    let modal = document.querySelector("#book_modal")
+    modal?.classList.remove('hidden');
+    modal?.setAttribute("action", action);
+  }
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -38,18 +44,18 @@ function App() {
         <Navbar />
         <div className="py-6">
           <div className='max-w-screen-xl px-4 mx-auto md:items-center md:justify-between md:flex-row md:px-6 lg:px-8'>
+            <BookModal id="book_modal" />
             <Message type={msg.type} message={msg.message} />
             <BookTable book_list={books} />
           </div>
         </div>
-        <BookModal action='add' id="book_modal" />
         <div className="relative">
           <button className="z-20 text-white flex flex-col shrink-0 grow-0 justify-around 
                   fixed bottom-0 right-0 right-5 rounded-lg
                   mr-1 mb-5 lg:mr-5 lg:mb-5 xl:mr-10 xl:mb-10"
             onClick={
               () => {
-                document.querySelector('#book_modal')?.classList.remove('hidden');
+                openModal('add')
                 setMsg({ 'type': 'success', 'message': 'New book added!' })
               }
             }>
