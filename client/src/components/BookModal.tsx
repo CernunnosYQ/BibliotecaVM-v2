@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNotification } from "../contexts/NotificationContext"
+import { useModal } from "../contexts/ModalContext"
 
 interface ModalProps {
   show?: boolean
@@ -17,7 +17,7 @@ export default function BookModal(props: ModalProps) {
   const [synopsis, setSynopsis] = useState('')
   const [categories, setCategories] = useState('')
 
-  const { sendNotification } = useNotification()
+  const { sendNotification, modal_action } = useModal()
 
 
   function toggle_switch() {
@@ -54,7 +54,7 @@ export default function BookModal(props: ModalProps) {
 
   const handle_submit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    let action = document.querySelector(`#${props.id}`)?.getAttribute("action");
+    let action = modal_action;
 
     let data = {
       title,
@@ -78,6 +78,8 @@ export default function BookModal(props: ModalProps) {
         .then(res => res.json)
         .then(data => {
           console.log(data);
+          sendNotification('success', 'Book added')
+          document.querySelector(`#${props.id}`)?.classList.add('hidden');
         })
         .catch(error => (
           console.log(error)
@@ -88,7 +90,6 @@ export default function BookModal(props: ModalProps) {
 
   return (
     <div id={props.id}
-      onChange={() => { console.log('Change') }}
       className="absolute h-screen w-screen m-0 p-0 flex justify-center items-center left-0 top-0 bg-gray-600/60 z-40 hidden">
       <div className="md:max-h-5/6 mb-auto md:my-auto md:w-3/4 lg:w-1/3 mx-auto px-8 py-4 bg-gray-200">
         <form action="">

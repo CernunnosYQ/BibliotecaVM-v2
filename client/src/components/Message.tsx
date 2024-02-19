@@ -1,10 +1,10 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleInfo, faTriangleExclamation, faCircleCheck } from '@fortawesome/free-solid-svg-icons'
-import { useNotification } from '../contexts/NotificationContext';
+import { useModal } from '../contexts/ModalContext';
 
 
 export default function Message() {
-  const {notification} = useNotification()
+  const {notification} = useModal()
 
   return (
     <>
