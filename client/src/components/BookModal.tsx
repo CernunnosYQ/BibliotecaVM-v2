@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useNotification } from "../contexts/NotificationContext"
 
 interface ModalProps {
   show?: boolean
@@ -15,6 +16,8 @@ export default function BookModal(props: ModalProps) {
   const [book_type, setBookType] = useState('')
   const [synopsis, setSynopsis] = useState('')
   const [categories, setCategories] = useState('')
+
+  const { sendNotification } = useNotification()
 
 
   function toggle_switch() {
@@ -45,6 +48,7 @@ export default function BookModal(props: ModalProps) {
     setSynopsis('');
     setCategories('');
 
+    sendNotification('info', 'Notification received')
     document.querySelector(`#${props.id}`)?.classList.add('hidden');
   }
 
@@ -84,6 +88,7 @@ export default function BookModal(props: ModalProps) {
 
   return (
     <div id={props.id}
+      onChange={() => { console.log('Change') }}
       className="absolute h-screen w-screen m-0 p-0 flex justify-center items-center left-0 top-0 bg-gray-600/60 z-40 hidden">
       <div className="md:max-h-5/6 mb-auto md:my-auto md:w-3/4 lg:w-1/3 mx-auto px-8 py-4 bg-gray-200">
         <form action="">

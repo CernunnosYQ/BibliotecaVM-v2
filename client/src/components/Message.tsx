@@ -1,46 +1,45 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleInfo, faTriangleExclamation, faCircleCheck } from '@fortawesome/free-solid-svg-icons'
+import { useNotification } from '../contexts/NotificationContext';
 
-export interface MessageProps {
-  type: string;
-  message: string;
-}
 
-export default function Message(props: MessageProps) {
+export default function Message() {
+  const {notification} = useNotification()
+
   return (
     <>
       {
-        props.type === 'info' && (
+        notification.type === 'info' && (
           <div className='mb-4'>           
             <div className="flex justify-center bg-sky-100 border border-sky-500 text-sky-700 px-4 py-3" role="alert">
-              <p className="text-sm"><FontAwesomeIcon icon={faCircleInfo} /> {props.message}</p>
+              <p className="text-sm"><FontAwesomeIcon icon={faCircleInfo} /> {notification.message}</p>
             </div>
           </div>
         )
       }
       {
-        props.type === 'warn' && (
+        notification.type === 'warn' && (
           <div className='mb-4'>           
             <div className="flex justify-center bg-amber-100 border border-amber-500 text-amber-700 px-4 py-3" role="alert">
-              <p className="text-sm"><FontAwesomeIcon icon={faTriangleExclamation} /> {props.message}</p>
+              <p className="text-sm"><FontAwesomeIcon icon={faTriangleExclamation} /> {notification.message}</p>
             </div>
           </div>
         )
       }
       {
-        props.type === 'success' && (
+        notification.type === 'success' && (
           <div className='mb-4'>           
-            <div className="flex justify-center bg-green-100 border border-green-500 text-green-700 px-4 py-3" role="alert">
-              <p className="text-sm"><FontAwesomeIcon icon={faCircleCheck} /> {props.message}</p>
+            <div className="flex justify-center bg-green-100 border border-green-500 text-green-700 px-4 py-3 transition-all" role="alert">
+              <p className="text-sm"><FontAwesomeIcon icon={faCircleCheck} /> {notification.message}</p>
             </div>
           </div>
         )
       }
       {
-        props.type === 'error' && (
+        notification.type === 'error' && (
           <div className='mb-4'>           
             <div className="flex justify-center bg-red-100 border border-red-500 text-red-700 px-4 py-3" role="alert">
-              <p className="text-sm"><FontAwesomeIcon icon={faCircleCheck} /> {props.message}</p>
+              <p className="text-sm"><FontAwesomeIcon icon={faCircleCheck} /> {notification.message}</p>
             </div>
           </div>
         )

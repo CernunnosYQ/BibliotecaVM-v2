@@ -6,6 +6,7 @@ import Message from './components/Message'
 import Navbar from './components/Navbar'
 import BookTable, { BookProps } from './components/BookTable'
 import BookModal from './components/BookModal'
+import { NotificationProvider } from './contexts/NotificationContext'
 
 function App() {
   const [msg, setMsg] = useState({ 'type': 'none', 'message': '' })
@@ -44,8 +45,10 @@ function App() {
         <Navbar />
         <div className="py-6">
           <div className='max-w-screen-xl px-4 mx-auto md:items-center md:justify-between md:flex-row md:px-6 lg:px-8'>
-            <BookModal id="book_modal" />
-            <Message type={msg.type} message={msg.message} />
+            <NotificationProvider>
+              <BookModal id="book_modal" />
+              <Message />
+            </NotificationProvider>
             <BookTable book_list={books} />
           </div>
         </div>
