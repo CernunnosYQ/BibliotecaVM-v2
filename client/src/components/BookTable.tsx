@@ -1,8 +1,12 @@
+import { useBooks } from "../contexts/BooksContext"
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faEllipsis } from "@fortawesome/free-solid-svg-icons"
+import { useEffect } from "react"
 
 type BookListProps = {
-  book_list: BookProps[]
+  limit?: number
+  offset?: number
 }
 
 export interface BookProps {
@@ -19,7 +23,11 @@ export interface BookProps {
 
 
 const BookTable = (props: BookListProps) => {
-  console.log(props);
+  const { books_list, updateBooks } = useBooks()
+
+  useEffect(() => {
+    updateBooks()
+  }, [])
 
   return (
     <table className='min-w-full border-collapse block md:table'>
@@ -36,8 +44,16 @@ const BookTable = (props: BookListProps) => {
       </thead>
       <tbody>
         {
-          props.book_list.map((book) => (
-            <Book key={book.id} id={book.id} title={book.title} author={book.author} editorial={book.editorial} tags={book.tags} is_available={book.is_available} />
+          books_list.length !== 0 &&
+          books_list.map((book) => (
+            <Book
+              key={book.id}
+              id={book.id}
+              title={book.title}
+              author={book.author}
+              editorial={book.editorial}
+              tags={book.tags}
+              is_available={book.is_available} />
           ))
         }
       </tbody>
@@ -53,8 +69,6 @@ const Book = ({ id, title, author, editorial, tags, is_available }: BookProps) =
       </div>
     )
   })
-
-  console.log(is_available)
 
   return (
     <tr key={id} className="border-cstmgray-700 border-t">

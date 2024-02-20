@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useModal } from "../contexts/ModalContext"
+import { useBooks } from "../contexts/BooksContext"
 
 interface ModalProps {
   show?: boolean
@@ -18,8 +18,7 @@ export default function BookModal(props: ModalProps) {
   const [synopsis, setSynopsis] = useState('')
   const [categories, setCategories] = useState('')
 
-  const { sendNotification, modal_action } = useModal()
-
+  const { sendNotification, modal_action, changeModalAction, updateBooks } = useBooks()
 
   function toggle_switch() {
     let my_switch = document.querySelector('#switch')
@@ -49,12 +48,13 @@ export default function BookModal(props: ModalProps) {
     setSynopsis('');
     setCategories('');
 
-    props.onClose()
+    changeModalAction('none')
+    document.querySelector(`#${props.id}`)?.classList.add('hidden')
+    updateBooks()
   }
 
   const handle_submit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    let action = modal_action;
 
     let data = {
       title,
@@ -67,17 +67,19 @@ export default function BookModal(props: ModalProps) {
       is_available,
     }
 
-    if (action === 'add') {
+    if (modal_action === 'add') {
       await fetch('http://localhost:8000/api/create/book', {
         method: 'POST',
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' }
       })
-        .then(res => res.json)
+        .then(res => res.json())
         .then(data => {
           console.log(data);
           sendNotification('success', 'Book added')
-          props.onClose()
+          changeModalAction('none')
+          document.querySelector(`#${props.id}`)?.classList.add('hidden')
+          updateBooks()
         })
         .catch(error => (
           console.log(error)
