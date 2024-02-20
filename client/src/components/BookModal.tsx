@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { BookProps } from "./BookTable"
 import { useBooks } from "../contexts/BooksContext"
 
 interface ModalProps {
@@ -18,9 +19,50 @@ export default function BookModal(props: ModalProps) {
   const [synopsis, setSynopsis] = useState('')
   const [categories, setCategories] = useState('')
 
-  const { sendNotification, modal_action, changeModalAction, updateBooks } = useBooks()
+  const { sendNotification, modal_action, modal_target, changeModalAction, updateBooks } = useBooks()
+
+  useEffect(() => {
+    if (modal_action === 'none') {
+      let modal = document.querySelector(`#${props.id}`)
+      if (!modal?.classList.contains('hidden')) {
+        modal?.classList.add('hidden')
+      }
+    }
+    if (modal_action === 'edit') {
+      getBook()
+      document.querySelector(`#${props.id}`)?.classList.remove('hidden')
+    }
+  }, [modal_target])
+
+  async function getBook() {
+    try {
+      const response = await fetch('http://localhost:8000/api/get/book/' + modal_target)
+      const result = await response.json()
+      if (result.detail) {
+        sendNotification('error', `Error al obtener el libro: ${result.detail}`)
+      } else {
+        setBook(result)
+      }
+    } catch (error) {
+      sendNotification('error', String(error))
+    }
+  }
+
+  function setBook(book: BookProps) {
+    console.log(book)
+    setAvailable(book.is_available)
+    console.log(is_available)
+    setTitle(book.title);
+    setAuthor(book.author);
+    setIsbn(book.isbn || '');
+    setEditorial(book.editorial);
+    setBookType(book.book_type || '');
+    setSynopsis(book.synopsis || '');
+    setCategories(book.tags.join(', ') || '');
+  }
 
   function cleanModal() {
+    setAvailable(true)
     setTitle('');
     setAuthor('');
     setIsbn('');

@@ -1,7 +1,7 @@
 import { useBooks } from "../contexts/BooksContext"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faEllipsis } from "@fortawesome/free-solid-svg-icons"
+import { faEllipsis, faTrash } from "@fortawesome/free-solid-svg-icons"
 import { useEffect } from "react"
 
 type BookListProps = {
@@ -18,7 +18,7 @@ export interface BookProps {
   editorial: string
   book_type?: string
   tags: string[]
-  is_available: string
+  is_available: boolean
 }
 
 
@@ -62,6 +62,11 @@ const BookTable = (props: BookListProps) => {
 }
 
 const Book = ({ id, title, author, editorial, tags, is_available }: BookProps) => {
+  const { changeModalAction } = useBooks()
+  const handleClick = () => {
+    changeModalAction('edit', id)
+  }
+
   let category_badges = tags.map((tag, iter) => {
     return (
       <div key={iter} className="center relative inline-block select-none whitespace-nowrap rounded-xl bg-blue-300 py-2 px-3 ml-1 align-baseline text-sm leading-none">
@@ -90,8 +95,13 @@ const Book = ({ id, title, author, editorial, tags, is_available }: BookProps) =
 
       </td>
       <td className="py-2 align-middle text-center">
-        <button className="bg-gray-600 hover:bg-gray-500 px-4 py-1 rounded-full text-gray-200">
+        <button
+          onClick={handleClick}
+          className="bg-gray-600 hover:bg-gray-500 px-4 py-1 rounded-full text-gray-200">
           <FontAwesomeIcon icon={faEllipsis} color="#fff" />
+        </button>
+        <button className="bg-gray-600 hover:bg-gray-500 px-4 py-1 rounded-full text-gray-200 ml-3">
+          <FontAwesomeIcon icon={faTrash} color="#fff" />
         </button>
       </td>
     </tr >

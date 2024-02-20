@@ -5,7 +5,8 @@ type BooksContextType = {
   notification: { type: string, message: string }
   sendNotification: (type: string, message: string) => void
   modal_action: string
-  changeModalAction: (action: string) => void
+  modal_target: number | null
+  changeModalAction: (action: string, id?: number) => void
   books_list: BookProps[]
   updateBooks: () => Promise<void>
 }
@@ -15,14 +16,16 @@ const BooksContext = createContext<BooksContextType | undefined>(undefined);
 export const BooksProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [notification, setNotification] = useState({ 'type': 'none', 'message': '' })
   const [modal_action, setModalAction] = useState('')
+  const [modal_target, setModalTarget] = useState<number | null>(null)
   const [books_list, setBooks] = useState<BookProps[]>([])
 
   const sendNotification = (type: string, message: string): void => {
     setNotification({ type, message })
   }
 
-  const changeModalAction = (action: string): void => {
+  const changeModalAction = (action: string, id?: number): void => {
     setModalAction(action)
+    setModalTarget(id || null)
   }
 
   const updateBooks = async (): Promise<void> => {
@@ -44,7 +47,7 @@ export const BooksProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   return (
     <BooksContext.Provider value={{
       notification, sendNotification,
-      modal_action, changeModalAction,
+      modal_action, modal_target, changeModalAction,
       books_list, updateBooks
     }}>
       {children}
