@@ -34,26 +34,28 @@ function App() {
     modal?.classList.remove('hidden');
   }
 
+  const closeModal = () => {
+    let modal = document.querySelector("#book_modal")
+    modal?.classList.add('hidden');
+    fetchData();
+  }
+
   useEffect(() => {
     fetchData();
   }, []);
 
   return (
-    <>
-      <div className=''>
-        <ModalProvider>
-          <Navbar />
-          <div className="py-6">
-            <div className='max-w-screen-xl px-4 mx-auto md:items-center md:justify-between md:flex-row md:px-6 lg:px-8'>
-              <BookModal id="book_modal" />
-              <Message />
-              <BookTable book_list={books} />
-              <ButtonCreate onClick={openModal} />
-            </div>
-          </div>
-        </ModalProvider>
-      </div >
-    </>
+    <ModalProvider>
+      <Navbar />
+      <div className="py-6">
+        <div className='max-w-screen-xl px-4 mx-auto md:items-center md:justify-between md:flex-row md:px-6 lg:px-8'>
+          <BookModal id="book_modal" onClose={closeModal} />
+          <Message />
+          <BookTable book_list={books} />
+          <ButtonCreate onClick={openModal} />
+        </div>
+      </div>
+    </ModalProvider>
   )
 }
 

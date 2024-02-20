@@ -5,6 +5,7 @@ interface ModalProps {
   show?: boolean
   id: string
   book_id?: number
+  onClose: () => void
 }
 
 export default function BookModal(props: ModalProps) {
@@ -48,8 +49,7 @@ export default function BookModal(props: ModalProps) {
     setSynopsis('');
     setCategories('');
 
-    sendNotification('info', 'Notification received')
-    document.querySelector(`#${props.id}`)?.classList.add('hidden');
+    props.onClose()
   }
 
   const handle_submit = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -67,8 +67,6 @@ export default function BookModal(props: ModalProps) {
       is_available,
     }
 
-    console.log(action, data)
-
     if (action === 'add') {
       await fetch('http://localhost:8000/api/create/book', {
         method: 'POST',
@@ -79,13 +77,12 @@ export default function BookModal(props: ModalProps) {
         .then(data => {
           console.log(data);
           sendNotification('success', 'Book added')
-          document.querySelector(`#${props.id}`)?.classList.add('hidden');
+          props.onClose()
         })
         .catch(error => (
           console.log(error)
         ))
     }
-
   }
 
   return (
