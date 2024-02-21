@@ -16,7 +16,6 @@ const getAllBooks = async (): Promise<{ success: boolean, data: BookProps[] }> =
   }
 }
 
-
 const getBook = async (id: number): Promise<{ success: boolean, data: BookProps | null }> => {
   try {
     const response = await fetch(`${API_URL}/get/book/${id}`)
@@ -31,7 +30,6 @@ const getBook = async (id: number): Promise<{ success: boolean, data: BookProps 
     return { success: false, data: null }
   }
 }
-
 
 const createNewBook = async (bookData: BookProps): Promise<{ success: boolean, detail: string }> => {
   try {
@@ -52,8 +50,44 @@ const createNewBook = async (bookData: BookProps): Promise<{ success: boolean, d
   }
 }
 
+const updateBook = async (book_data: BookProps): Promise<{ success: boolean; detail: string }> => {
+  try {
+    const response = await fetch(`${API_URL}/update/book/${book_data.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(book_data),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const data = await response.json()
+
+    if (response.status === 200) {
+      return { success: true, detail: 'Book updated successfuly' }
+    } else {
+      return { success: false, detail: data.detail ? data.detail : 'Error updating the book' }
+    }
+  } catch (error) {
+    return { success: false, detail: 'Error updating the book' }
+  }
+}
+
+const deleteBook = async (id: number): Promise<{ success: boolean, detail: string }> => {
+  try {
+    const response = await fetch(`${API_URL}/delete/book/${id}`, { method: 'DELETE' })
+    const data = await response.json()
+
+    if (response.status === 200) {
+      return { success: true, detail: "The book was deleted" }
+    } else {
+      return { success: false, detail: data.detail ? data.detail : "Could not delete the book." }
+    }
+  } catch (error) {
+    return { success: false, detail: "Could not delete the book." }
+  }
+}
+
 export {
   getAllBooks,
   getBook,
-  createNewBook
+  createNewBook,
+  updateBook,
+  deleteBook,
 };
