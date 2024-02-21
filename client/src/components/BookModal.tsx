@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import { BookProps } from "./BookTable"
 import { useBooks } from "../contexts/BooksContext"
 
+import { getBook, createNewBook } from "../utils/crud"
+
 interface ModalProps {
   show?: boolean
   id: string
@@ -28,30 +30,21 @@ export default function BookModal(props: ModalProps) {
         modal?.classList.add('hidden')
       }
     }
-    if (modal_action === 'edit') {
-      getBook()
+    if (modal_action === 'edit' && modal_target) {
+      getBookData(modal_target)
       document.querySelector(`#${props.id}`)?.classList.remove('hidden')
     }
   }, [modal_target])
 
-  async function getBook() {
-    try {
-      const response = await fetch('http://localhost:8000/api/get/book/' + modal_target)
-      const result = await response.json()
-      if (result.detail) {
-        sendNotification('error', `Error al obtener el libro: ${result.detail}`)
-      } else {
-        setBook(result)
-      }
-    } catch (error) {
-      sendNotification('error', String(error))
+  async function getBookData(id: number) {
+    let { success, data } = await getBook(id)
+    if (success) {
+      setBook(data as BookProps)
     }
   }
 
   function setBook(book: BookProps) {
-    console.log(book)
     setAvailable(book.is_available)
-    console.log(is_available)
     setTitle(book.title);
     setAuthor(book.author);
     setIsbn(book.isbn || '');
@@ -72,13 +65,14 @@ export default function BookModal(props: ModalProps) {
     setCategories('');
 
     changeModalAction('none')
+    updateBooks()
+
+    document.querySelector(`#${props.id}`)?.classList.add('hidden')
   }
 
   const handle_cancel = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     cleanModal()
-
-    document.querySelector(`#${props.id}`)?.classList.add('hidden')
     updateBooks()
   }
 
@@ -88,25 +82,13 @@ export default function BookModal(props: ModalProps) {
     let data = { title, author, isbn, editorial, book_type, synopsis, 'tags': categories.split(','), is_available }
 
     if (modal_action === 'add') {
-      await fetch('http://localhost:8000/api/create/book', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' }
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.detail) {
-            sendNotification('error', 'Error creating book, check data and try again')
-          } else {
-            sendNotification('success', 'Book added')
-            cleanModal()
-            document.querySelector(`#${props.id}`)?.classList.add('hidden')
-            updateBooks()
-          }
-        })
-        .catch(() => (
-          sendNotification('error', 'Request error, try again')
-        ))
+      let { success, detail } = await createNewBook(data)
+      if (success) {
+        sendNotification('success', 'Book added')
+        cleanModal()
+      } else {
+        sendNotification('error', detail)
+      }
     }
   }
 

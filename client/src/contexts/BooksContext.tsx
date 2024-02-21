@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { BookProps } from "../components/BookTable";
 
+import { getAllBooks } from "../utils/crud";
+
 type BooksContextType = {
   notification: { type: string, message: string }
   sendNotification: (type: string, message: string) => void
@@ -29,18 +31,11 @@ export const BooksProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }
 
   const updateBooks = async (): Promise<void> => {
-    try {
-      const response = await fetch('http://localhost:8000/api/get/books')
-      const result = await response.json()
-      if (result.detail) {
-        sendNotification('error', `Error al obtener los libros: ${result.detail}`)
-        setBooks([])
-      } else {
-        setBooks(result)
-      }
-    } catch (error) {
-      sendNotification('error', String(error))
-      setBooks([])
+    let { success, data } = await getAllBooks()
+    if (success) {
+      setBooks(data)
+    } else {
+      sendNotification('error', 'Error retreiving books')
     }
   }
 
