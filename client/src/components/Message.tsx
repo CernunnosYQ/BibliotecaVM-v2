@@ -1,76 +1,57 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCircleInfo, faTriangleExclamation, faCircleCheck } from '@fortawesome/free-solid-svg-icons'
+import { faCircleInfo, faCircleExclamation, faTriangleExclamation, faCircleCheck, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useBooks } from '../contexts/BooksContext';
+import { useEffect, useState } from 'react';
 
+
+const NOTIFICATION_TYPES = [
+  { type: 'info', classes: 'bg-sky-100 border-sky-500 text-sky-700', icon: faCircleInfo },
+  { type: 'warn', classes: 'bg-amber-100 border-amber-500 text-amber-700', icon: faCircleExclamation },
+  { type: 'error', classes: 'bg-red-100 border-red-500 text-red-700', icon: faTriangleExclamation },
+  { type: 'success', classes: 'bg-emerald-100 border-emerald-500 text-emerald-700', icon: faCircleCheck },
+]
 
 export default function Message() {
-  const {notification} = useBooks()
+  const { notification, sendNotification } = useBooks()
+
+  const [show, setShow] = useState(false)
+  const [classes, setClasses] = useState('')
+  const [icon, setIcon] = useState<any>(faCircleInfo)
+
+  const findNotificationType = (type: string): void => {
+    const foundType = NOTIFICATION_TYPES.find(item => item.type === type)
+    if (!foundType) {
+      setShow(false)
+    } else {
+      setShow(true)
+      setClasses(foundType.classes)
+      setIcon(foundType.icon)
+    }
+  }
+
+  useEffect(() => {
+    findNotificationType(notification.type)
+  }, [notification])
 
   return (
     <>
       {
-        notification.type === 'info' && (
-          <div className='mb-4'>           
-            <div className="flex justify-center bg-sky-100 border border-sky-500 text-sky-700 px-4 py-3" role="alert">
-              <p className="text-sm"><FontAwesomeIcon icon={faCircleInfo} /> {notification.message}</p>
+        <div className='mb-4 relative'>
+          <div className={`flex justify-center transition-all border px-4 py-3 ${classes} ${show ? '' : 'hidden'}`} role="alert">
+            <div className="flex-1 text-center">
+              <p className="text-sm"><FontAwesomeIcon icon={icon} /> {notification.message}</p>
             </div>
+
+            <button
+              onClick={() => {
+                sendNotification('none', '')
+              }}
+              className={`flex-none -my-1 px-2 border ${classes}`}>
+              <FontAwesomeIcon icon={faXmark} />
+            </button>
           </div>
-        )
-      }
-      {
-        notification.type === 'warn' && (
-          <div className='mb-4'>           
-            <div className="flex justify-center bg-amber-100 border border-amber-500 text-amber-700 px-4 py-3" role="alert">
-              <p className="text-sm"><FontAwesomeIcon icon={faTriangleExclamation} /> {notification.message}</p>
-            </div>
-          </div>
-        )
-      }
-      {
-        notification.type === 'success' && (
-          <div className='mb-4'>           
-            <div className="flex justify-center bg-green-100 border border-green-500 text-green-700 px-4 py-3 transition-all" role="alert">
-              <p className="text-sm"><FontAwesomeIcon icon={faCircleCheck} /> {notification.message}</p>
-            </div>
-          </div>
-        )
-      }
-      {
-        notification.type === 'error' && (
-          <div className='mb-4'>           
-            <div className="flex justify-center bg-red-100 border border-red-500 text-red-700 px-4 py-3" role="alert">
-              <p className="text-sm"><FontAwesomeIcon icon={faCircleCheck} /> {notification.message}</p>
-            </div>
-          </div>
-        )
+        </div>
       }
     </>
   )
 }
-
-// <!-- component -->
-    
-//     <div class="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3" role="alert">
-//         <p class="font-bold">Informational message</p>
-//         <p class="text-sm">Some additional text to explain said message.</p>
-//     </div>
-
-//     <div class="bg-amber-100 border-t border-b border-amber-500 text-amber-700 px-4 py-3" role="alert">
-//         <p class="font-bold">Informational message</p>
-//         <p class="text-sm">Some additional text to explain said message.</p>
-//     </div>
-
-//     <div class="bg-red-100 border-t border-b border-red-500 text-red-700 px-4 py-3" role="alert">
-//         <p class="font-bold">Informational message</p>
-//         <p class="text-sm">Some additional text to explain said message.</p>
-//     </div>
-
-//     <div class="bg-purple-100 border-t border-b border-purple-500 text-purple-700 px-4 py-3" role="alert">
-//         <p class="font-bold">Informational message</p>
-//         <p class="text-sm">Some additional text to explain said message.</p>
-//     </div>
-//      <div class="bg-gray-100 border-t border-b border-gray-500 text-gray-700 px-4 py-3" role="alert">
-//         <p class="font-bold">Informational message</p>
-//         <p class="text-sm">Some additional text to explain said message.</p>
-//     </div>
-// </div>
