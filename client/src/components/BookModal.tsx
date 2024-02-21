@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { BookProps } from "./BookTable"
 import { useBooks } from "../contexts/BooksContext"
 
-import { getBook, createNewBook } from "../utils/crud"
+import { getBook, createNewBook, updateBook } from "../utils/crud"
 
 interface ModalProps {
   show?: boolean
@@ -85,6 +85,16 @@ export default function BookModal(props: ModalProps) {
       let { success, detail } = await createNewBook(data)
       if (success) {
         sendNotification('success', 'Book added')
+        cleanModal()
+      } else {
+        sendNotification('error', detail)
+      }
+    }
+
+    if (modal_action === 'edit' && modal_target) {
+      let { success, detail } = await updateBook({ ...data, id: modal_target })
+      if (success) {
+        sendNotification('success', 'Book updated')
         cleanModal()
       } else {
         sendNotification('error', detail)

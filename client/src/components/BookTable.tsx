@@ -1,8 +1,9 @@
-import { useBooks } from "../contexts/BooksContext"
-
+import { useEffect } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faEllipsis, faTrash } from "@fortawesome/free-solid-svg-icons"
-import { useEffect } from "react"
+
+import { deleteBook } from "../utils/crud"
+import { useBooks } from "../contexts/BooksContext"
 
 type BookListProps = {
   limit?: number
@@ -62,9 +63,22 @@ const BookTable = (props: BookListProps) => {
 }
 
 const Book = ({ id, title, author, editorial, tags, is_available }: BookProps) => {
-  const { changeModalAction } = useBooks()
+  const { changeModalAction, sendNotification, updateBooks } = useBooks()
   const handleClick = () => {
     changeModalAction('edit', id)
+  }
+
+  const handleDelete = async () => {
+    const isConfirmed = window.confirm('Are you sure you want to delete?');
+    if (isConfirmed && id) {
+      let { success, detail } = await deleteBook(id)
+      if (success) {
+        sendNotification('success', detail)
+        updateBooks()
+      } else {
+        sendNotification('error', detail)
+      }
+    }
   }
 
   let category_badges = tags.map((tag, iter) => {
@@ -100,7 +114,9 @@ const Book = ({ id, title, author, editorial, tags, is_available }: BookProps) =
           className="bg-gray-600 hover:bg-gray-500 px-4 py-1 rounded-full text-gray-200">
           <FontAwesomeIcon icon={faEllipsis} color="#fff" />
         </button>
-        <button className="bg-gray-600 hover:bg-gray-500 px-4 py-1 rounded-full text-gray-200 ml-3">
+        <button
+          onClick={handleDelete}
+          className="bg-gray-600 hover:bg-gray-500 px-4 py-1 rounded-full text-gray-200 ml-3">
           <FontAwesomeIcon icon={faTrash} color="#fff" />
         </button>
       </td>
