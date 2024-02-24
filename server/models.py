@@ -4,6 +4,7 @@ from sqlalchemy.orm import as_declarative
 
 from sqlalchemy import (
     ARRAY,
+    BINARY,
     Boolean,
     Column,
     DateTime,
@@ -71,5 +72,38 @@ def delete_book_by_id(id, db):
         return {"detail": f"Book with ID {id} not found."}
 
     book.delete()
+    db.commit()
+    return {"success": True}
+
+
+class User(Base):
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    password_hash = Column(BINARY, nullable=False)
+    salt = Column(BINARY, nullable=False)
+
+
+def get_user(username, db):
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        return {"detail": f'User "{username}" does not exist.'}
+
+    return user
+
+
+def create_new_user(user, db):
+    new_user = User(**user.__dict__)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+
+def delete_user(username, db):
+    user = db.query(User).filter(User.username == username)
+    if not user:
+        return {"detail": f'User "{username}" does not exist.'}
+
+    user.delete()
     db.commit()
     return {"success": True}
