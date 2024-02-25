@@ -30,3 +30,13 @@ class BookShow(BaseModel):
 
 class BookUpdate(BookCreate):
     pass
+
+
+class UserCreate(BaseModel):
+    username: str
+    password: str
+
+
+class UserShow(BaseModel):
+    username: str
+    password: str

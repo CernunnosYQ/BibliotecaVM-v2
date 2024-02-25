@@ -88,7 +88,7 @@ def get_user(username, db):
     if not user:
         return {"detail": f'User "{username}" does not exist.'}
 
-    return user
+    return {"success": True, "data": user.__dict__}
 
 
 def create_new_user(user, db):
@@ -96,7 +96,7 @@ def create_new_user(user, db):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return new_user
+    return {"success": True}
 
 
 def delete_user(username, db):
