@@ -4,14 +4,14 @@ from sqlalchemy.orm import as_declarative
 
 from sqlalchemy import (
     ARRAY,
-    BINARY,
     Boolean,
     Column,
-    DateTime,
     Integer,
     String,
     Text,
 )
+
+from security import Hasher
 
 
 @as_declarative()
@@ -79,8 +79,8 @@ def delete_book_by_id(id, db):
 class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True, nullable=False)
-    password_hash = Column(BINARY, nullable=False)
-    salt = Column(BINARY, nullable=False)
+    password_hash = Column(String, nullable=False)
+    is_superuser = Column(Boolean, default=False)
 
 
 def get_user(username, db):
@@ -88,11 +88,13 @@ def get_user(username, db):
     if not user:
         return {"detail": f'User "{username}" does not exist.'}
 
-    return {"success": True, "data": user.__dict__}
+    return user
 
 
 def create_new_user(user, db):
-    new_user = User(**user.__dict__)
+    new_user = User(
+        username=user.username, password_hash=Hasher.hash_password(user.password)
+    )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
