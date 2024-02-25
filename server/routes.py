@@ -12,9 +12,11 @@ from models.book import (
     delete_book_by_id,
 )
 from models.user import get_user, create_new_user
-from security import Hasher, create_access_token
+from security import Hasher, create_access_token, validate_access_token
 
 router = APIRouter()
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 
 
 @router.get("/get/books", response_model=list[BookShow])
@@ -40,37 +42,64 @@ async def get_book(id: int, db: Session = Depends(get_db)):
 @router.post(
     "/create/book", response_model=BookShow, status_code=status.HTTP_201_CREATED
 )
-async def create_book(book: BookCreate, db: Session = Depends(get_db)):
+async def create_book(
+    book: BookCreate, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+):
     """Create a new book"""
 
-    book = create_new_book(db=db, book=book)
-    return BookShow(**book.__dict__)
+    validation = validate_access_token(token=token)
+    if not validation.get("success"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=validation.get("detail")
+        )
+    else:
+        book = create_new_book(db=db, book=book)
+        return BookShow(**book.__dict__)
 
 
 @router.put("/update/book/{id}", response_model=BookShow)
-async def update_book(id: int, book: BookUpdate, db: Session = Depends(get_db)):
+async def update_book(
+    id: int,
+    book: BookUpdate,
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme),
+):
     """Update an existing book"""
 
-    book = update_book_by_id(id=id, book=book, db=db)
-    if isinstance(book, dict):
+    validation = validate_access_token(token=token)
+    if not validation.get("success"):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=book.get("detail")
+            status_code=status.HTTP_403_FORBIDDEN, detail=validation.get("detail")
         )
+    else:
+        book = update_book_by_id(id=id, book=book, db=db)
+        if isinstance(book, dict):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=book.get("detail")
+            )
 
-    return BookShow(**book.__dict__)
+        return BookShow(**book.__dict__)
 
 
 @router.delete("/delete/book/{id}", status_code=status.HTTP_200_OK)
-async def delete_book(id: int, db: Session = Depends(get_db)):
+async def delete_book(
+    id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+):
     """Delete a book by its id"""
 
-    message = delete_book_by_id(id=id, db=db)
-    if not message.get("success"):
+    validation = validate_access_token(token=token)
+    if not validation.get("success"):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=message.get("detail")
+            status_code=status.HTTP_403_FORBIDDEN, detail=validation.get("detail")
         )
+    else:
+        message = delete_book_by_id(id=id, db=db)
+        if not message.get("success"):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=message.get("detail")
+            )
 
-    return {"message": "Successfully deleted book"}
+        return {"message": "Successfully deleted book"}
 
 
 def authenticate_user(username, password, db):
@@ -97,9 +126,6 @@ async def login_for_access_token(
     access_token = create_access_token(data={"sub": user.username})
 
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
