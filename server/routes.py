@@ -4,15 +4,14 @@ from sqlalchemy.orm import Session
 
 from session import get_db
 from schemas import BookCreate, BookShow, BookUpdate, UserCreate, Token
-from models import (
+from models.book import (
     get_all_books,
     get_book_by_id,
     create_new_book,
     update_book_by_id,
     delete_book_by_id,
-    get_user,
-    create_new_user,
 )
+from models.user import get_user, create_new_user
 from security import Hasher, create_access_token
 
 router = APIRouter()

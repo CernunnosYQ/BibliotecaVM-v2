@@ -1,7 +1,3 @@
-from typing import Any
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import as_declarative
-
 from sqlalchemy import (
     ARRAY,
     Boolean,
@@ -11,17 +7,7 @@ from sqlalchemy import (
     Text,
 )
 
-from security import Hasher
-
-
-@as_declarative()
-class Base:
-    id: Any
-    __name__: str
-
-    @declared_attr
-    def __tablename__(cls) -> str:
-        return cls.__name__.lower() + "s"
+from models.base import Base
 
 
 class Book(Base):
@@ -72,40 +58,5 @@ def delete_book_by_id(id, db):
         return {"detail": f"Book with ID {id} not found."}
 
     book.delete()
-    db.commit()
-    return {"success": True}
-
-
-class User(Base):
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True, nullable=False)
-    password_hash = Column(String, nullable=False)
-    is_superuser = Column(Boolean, default=False)
-
-
-def get_user(username, db):
-    user = db.query(User).filter(User.username == username).first()
-    if not user:
-        return {"detail": f'User "{username}" does not exist.'}
-
-    return user
-
-
-def create_new_user(user, db):
-    new_user = User(
-        username=user.username, password_hash=Hasher.hash_password(user.password)
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return {"success": True}
-
-
-def delete_user(username, db):
-    user = db.query(User).filter(User.username == username)
-    if not user:
-        return {"detail": f'User "{username}" does not exist.'}
-
-    user.delete()
     db.commit()
     return {"success": True}

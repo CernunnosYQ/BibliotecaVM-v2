@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 
 from config import settings
 from session import engine
-from models import Base
+from models.book import Base
 from routes import router as api_router
 
 
