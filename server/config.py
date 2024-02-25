@@ -19,6 +19,8 @@ class Settings:
     DB_URL: str = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
     SECRET_KEY: str = os.getenv("SECRET_KEY")
+    JWT_ALGORITHM: str = "HS512"
+    EXP_MINS = 30
 
     CORS_ORIGINS: list[str] = (
         json.loads(os.getenv("CORS_ORIGINS")) if os.getenv("CORS_ORIGINS") else []
