@@ -23,7 +23,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     if expires_delta:
         expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(UTC) + timedelta(settings.EXP_MINS)
+        expire = datetime.now(UTC) + timedelta(minutes=settings.EXP_MINS)
 
     token = encode(
         payload={**data, "exp": expire},
