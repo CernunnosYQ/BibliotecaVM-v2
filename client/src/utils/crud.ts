@@ -109,11 +109,31 @@ const login = async (username: string, password: string) => {
   }
 }
 
+const register = async (username: string, password: string) => {
+  try {
+    const response = await fetch(`${API_URL}/register`, {
+      method: 'POST',
+      body: JSON.stringify({ 'username': username, 'password': password }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+
+    const data = await response.json()
+    if (!data.success) {
+      console.error(`'Failed to create account: ${data.detail}`)
+    } else {
+      login(username, password)
+    }
+  } catch (error) {
+    console.error(`Failed to create account: ${error}`)
+  }
+}
+
 export {
   getAllBooks,
   getBook,
   createNewBook,
   updateBook,
   deleteBook,
-  login
+  login,
+  register,
 };
