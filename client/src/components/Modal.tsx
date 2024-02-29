@@ -5,7 +5,6 @@ const Modal = (props: { id: string, onClose?: () => void, className?: string, ch
   const containerRef = useRef<HTMLDivElement>(null)
 
   const toggleVisible = () => {
-    document.removeEventListener('mousedown', handleClickOutside)
     if (props.onClose) props.onClose()
   }
 
