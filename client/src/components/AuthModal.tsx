@@ -1,30 +1,32 @@
 import { useState } from "react"
+import { useBooks } from "../contexts/BooksContext"
 import Modal, { ModalHeader } from "./Modal"
 import { login, register } from "../utils/crud"
 
 
 const AuthModal = (props: { id: string, onClose: () => void }) => {
-  const [showLogin, setShowLogin] = useState<boolean>(true);
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [showLogin, setShowLogin] = useState<boolean>(true)
+  const [username, setUsername] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+
+  const { sendNotification } = useBooks()
 
   const handleToggleForm = () => {
     setShowLogin(!showLogin);
   }
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
+    let { success, detail } = (showLogin ? await login(username, password) : await register(username, password))
 
-    if (showLogin) {
-      login(username, password)
+    if (success) {
+      setUsername('')
+      setPassword('')
+      props.onClose()
     } else {
-      register(username, password)
+      setPassword('')
+      sendNotification('error', detail ? detail : 'Failed to authenticate')
     }
-
-    setUsername('')
-    setPassword('')
-
-    props.onClose();
   }
 
   return (

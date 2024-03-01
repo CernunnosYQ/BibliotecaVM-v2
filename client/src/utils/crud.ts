@@ -1,4 +1,4 @@
-import { BookProps } from "../components/BookTable";
+import { BookProps } from "../components/Book";
 
 const API_URL = 'http://localhost:8000/api'
 
@@ -91,7 +91,7 @@ const deleteBook = async (id: number): Promise<{ success: boolean, detail: strin
   }
 }
 
-const login = async (username: string, password: string) => {
+const login = async (username: string, password: string): Promise<{ success: boolean, detail?: string }> => {
   try {
     const form_data = new FormData()
     form_data.append('username', username)
@@ -101,15 +101,19 @@ const login = async (username: string, password: string) => {
       method: 'POST',
       body: form_data,
     })
-
     const data = await response.json()
+
+    if (!response.ok) {
+      return { success: false, detail: data.detail }
+    }
     localStorage.setItem('access_token', data.access_token)
+    return { success: true, detail: 'Login successfully' }
   } catch (error) {
-    console.error("Error fetching token: ", error)
+    return { success: false, detail: `Error fetching token: ${error}` }
   }
 }
 
-const register = async (username: string, password: string) => {
+const register = async (username: string, password: string): Promise<{ success: boolean, detail?: string }> => {
   try {
     const response = await fetch(`${API_URL}/register`, {
       method: 'POST',
@@ -119,12 +123,12 @@ const register = async (username: string, password: string) => {
 
     const data = await response.json()
     if (!data.success) {
-      console.error(`'Failed to create account: ${data.detail}`)
+      return { success: false, detail: data.detail }
     } else {
-      login(username, password)
+      return login(username, password)
     }
   } catch (error) {
-    console.error(`Failed to create account: ${error}`)
+    return { success: false, detail: `Failed to create account: ${error}` }
   }
 }
 
