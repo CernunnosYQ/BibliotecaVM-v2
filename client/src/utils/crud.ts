@@ -6,11 +6,11 @@ const API_URL = 'http://localhost:8000/api'
 const getAllBooks = async (): Promise<{ success: boolean, data: BookProps[] }> => {
   try {
     const response = await fetch(`${API_URL}/get/books`)
-    const books = await response.json()
+    const data = await response.json()
     return (
-      books.detail
+      data.detail
         ? { success: false, data: [] }
-        : { success: true, data: books }
+        : { success: true, data: data.data }
     )
   } catch (error) {
     return { success: false, data: [] }
@@ -20,12 +20,12 @@ const getAllBooks = async (): Promise<{ success: boolean, data: BookProps[] }> =
 const getBook = async (id: number): Promise<{ success: boolean, data: BookProps | null }> => {
   try {
     const response = await fetch(`${API_URL}/get/book/${id}`)
-    const book = await response.json()
+    const data = await response.json()
 
     return (
-      book.detail
+      data.detail
         ? { success: false, data: null }
-        : { success: true, data: book }
+        : { success: true, data: data.data }
     )
   } catch (error) {
     return { success: false, data: null }
@@ -43,6 +43,7 @@ const createNewBook = async (bookData: BookProps): Promise<{ success: boolean, d
     const data = await response.json()
 
     if (response.status === 201) {
+      localStorage.setItem('access_token', data.token)
       return { success: true, detail: 'Book created successfully.' }
     } else {
       return { success: false, detail: data.detail ? data.detail : 'An error occurred while creating the book.' }
@@ -63,6 +64,9 @@ const updateBook = async (book_data: BookProps): Promise<{ success: boolean; det
     const data = await response.json()
 
     if (response.status === 200) {
+      console.log(localStorage.getItem('access_token'))
+      localStorage.setItem('access_token', data.token)
+      console.log(localStorage.getItem('access_token'))
       return { success: true, detail: 'Book updated successfuly' }
     } else {
       return { success: false, detail: data.detail ? data.detail : 'Error updating the book' }
@@ -82,6 +86,7 @@ const deleteBook = async (id: number): Promise<{ success: boolean, detail: strin
     const data = await response.json()
 
     if (response.status === 200) {
+      localStorage.setItem('access_token', data.token)
       return { success: true, detail: "The book was deleted" }
     } else {
       return { success: false, detail: data.detail ? data.detail : "Could not delete the book." }

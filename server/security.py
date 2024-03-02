@@ -1,5 +1,4 @@
 from jwt import encode, exceptions, decode
-from os import urandom
 from typing import Optional
 from datetime import datetime, timedelta, UTC
 from passlib.context import CryptContext
@@ -39,7 +38,17 @@ def validate_access_token(token: str):
         decoded_token = decode(
             token, key=settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
         )
-        return {"success": True, "payload": decoded_token}
+        naive_dt = datetime.fromtimestamp(decoded_token["exp"])
+        print(datetime.now(), naive_dt)
+
+        minutes_remaining = (naive_dt - datetime.now()).total_seconds() // 60
+        print(minutes_remaining)
+
+        if minutes_remaining < settings.EXP_MINS / 2:
+            del decoded_token["exp"]
+            token = create_access_token(data=decoded_token)
+
+        return {"success": True, "payload": decoded_token, "token": token}
     except exceptions.DecodeError:
         detail = "Invalid Token"
     except exceptions.ExpiredSignatureError:
