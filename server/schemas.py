@@ -1,5 +1,7 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, validator
+from pydantic import BaseModel, ConfigDict
+from pydantic.functional_validators import BeforeValidator
+from typing_extensions import Annotated
 from typing import Optional, List
 
 
@@ -14,6 +16,9 @@ class BookCreate(BaseModel):
     tags: Optional[List[str]] = []
 
 
+Tag = Annotated[str, BeforeValidator(lambda tag: tag.tag)]
+
+
 class BookShow(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -25,7 +30,7 @@ class BookShow(BaseModel):
     synopsis: str
     book_type: str
     is_available: bool
-    tags: List[str]
+    tags: List[Tag]
 
 
 class BookUpdate(BookCreate):

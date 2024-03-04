@@ -27,14 +27,16 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 async def get_books(db: Session = Depends(get_db)):
     """Get all books"""
 
-    return {"success": True, "data": get_all_books(db)}
+    books = [BookShow(**book.__dict__) for book in get_all_books(db=db)]
+
+    return {"success": True, "data": books}
 
 
 @router.get("/get/book/{id}")
 async def get_book(id: int, db: Session = Depends(get_db)):
     """Get one book by id"""
 
-    book = get_book_by_id(db=db, id=id)
+    book = get_book_by_id(db=db, book_id=id)
     if not book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Book not found"
@@ -78,7 +80,7 @@ async def update_book(
             status_code=status.HTTP_403_FORBIDDEN, detail=validation.get("detail")
         )
     else:
-        book = update_book_by_id(id=id, book=book, db=db)
+        book = update_book_by_id(book_id=id, book=book, db=db)
         if isinstance(book, dict):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail=book.get("detail")
@@ -103,7 +105,7 @@ async def delete_book(
             status_code=status.HTTP_403_FORBIDDEN, detail=validation.get("detail")
         )
     else:
-        message = delete_book_by_id(id=id, db=db)
+        message = delete_book_by_id(book_id=id, db=db)
         if not message.get("success"):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail=message.get("detail")
