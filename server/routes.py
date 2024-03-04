@@ -10,6 +10,7 @@ from models.book import (
     create_new_book,
     update_book_by_id,
     delete_book_by_id,
+    search_books_by_tag,
 )
 from models.user import get_user, create_new_user
 from security import (
@@ -28,7 +29,6 @@ async def get_books(db: Session = Depends(get_db)):
     """Get all books"""
 
     books = [BookShow(**book.__dict__) for book in get_all_books(db=db)]
-
     return {"success": True, "data": books}
 
 
@@ -116,6 +116,16 @@ async def delete_book(
             "detail": "Successfully dedleted book",
             "token": validation["token"],
         }
+
+
+@router.get("/get/tag/{tag}")
+def get_books_with_tag(tag: str, db: Session = Depends(get_db)):
+    """Get all books with the specified tag."""
+
+    books = [
+        BookShow(**book.__dict__) for book in search_books_by_tag(tag_name=tag, db=db)
+    ]
+    return {"success": True, "data": books}
 
 
 def authenticate_user(username, password, db):

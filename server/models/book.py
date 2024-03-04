@@ -8,7 +8,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship, subqueryload, joinedload, Session, Load
 
 from models.base import Base
-from models.tag import add_tags, update_tags, remove_all_tags
+from models.tag import Tag, add_tags, update_tags, remove_all_tags
 from schemas import BookCreate, BookUpdate
 
 
@@ -82,3 +82,14 @@ def delete_book_by_id(book_id: int, db: Session) -> dict:
     book.delete()
     db.commit()
     return {"success": True}
+
+
+def search_books_by_tag(tag_name: str, db: Session) -> list[Book]:
+    books_with_tag = (
+        db.query(Book)
+        .join(Book.tags)
+        .filter(Tag.tag == tag_name)
+        .options(joinedload(Book.tags))
+        .all()
+    )
+    return books_with_tag
